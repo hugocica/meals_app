@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:meals_app/data/dummy.dart';
 import 'package:meals_app/models/category.dart';
 import 'package:meals_app/models/meal.dart';
 import 'package:meals_app/screens/meals.dart';
 
 class CategoryGridItem extends StatelessWidget {
   const CategoryGridItem(
-      {super.key, required this.category, required this.onToggleFavorite});
+      {super.key,
+      required this.category,
+      required this.onToggleFavorite,
+      required this.availableMeals,
+      required this.favoriteMeals});
 
   final Category category;
+  final List<Meal> favoriteMeals;
+  final List<Meal> availableMeals;
   final void Function(Meal meal) onToggleFavorite;
 
   void _onSelectCategory(BuildContext context) {
@@ -16,11 +21,12 @@ class CategoryGridItem extends StatelessWidget {
       MaterialPageRoute(
         builder: (ctx) => MealsScreen(
           title: category.title,
-          meals: dummyMeals
+          meals: availableMeals
               .where(
                 (meal) => meal.categories.contains(category.id),
               )
               .toList(),
+          favoriteMeals: favoriteMeals,
           onToggleFavorite: onToggleFavorite,
         ),
       ),

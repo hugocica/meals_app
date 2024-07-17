@@ -1,35 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:meals_app/models/meal.dart';
 
-class MealDetailsScreen extends StatelessWidget {
-  const MealDetailsScreen({
-    super.key,
-    required this.meal,
-    required this.onToggleFavorite,
-  });
+class MealDetailsScreen extends StatefulWidget {
+  const MealDetailsScreen(
+      {super.key,
+      required this.meal,
+      required this.onToggleFavorite,
+      required this.favoriteMeals});
 
   final Meal meal;
+  final List<Meal> favoriteMeals;
   final void Function(Meal meal) onToggleFavorite;
-  final bool isFavorite = true;
+
+  @override
+  State<MealDetailsScreen> createState() {
+    return _MealDetailsScreenState();
+  }
+}
+
+class _MealDetailsScreenState extends State<MealDetailsScreen> {
+  bool _isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    setState(() {
+      _isFavorite = widget.favoriteMeals.contains(widget.meal);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(meal.title),
+        title: Text(widget.meal.title),
         actions: [
           IconButton(
             onPressed: () {
-              onToggleFavorite(meal);
+              setState(() {
+                _isFavorite = !_isFavorite;
+              });
+              widget.onToggleFavorite(widget.meal);
             },
-            icon: Icon(isFavorite ? Icons.star : Icons.star_outline),
+            icon: Icon(_isFavorite ? Icons.star : Icons.star_outline),
           ),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Image.network(meal.imageUrl),
+            Image.network(widget.meal.imageUrl),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -45,7 +66,7 @@ class MealDetailsScreen extends StatelessWidget {
                   const SizedBox(
                     height: 4,
                   ),
-                  ...meal.ingredients.map(
+                  ...widget.meal.ingredients.map(
                     (ingredient) => Text(
                       '- $ingredient',
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -66,7 +87,7 @@ class MealDetailsScreen extends StatelessWidget {
                   const SizedBox(
                     height: 4,
                   ),
-                  ...meal.steps.map(
+                  ...widget.meal.steps.map(
                     (step) => Text(
                       '- $step',
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
