@@ -9,9 +9,11 @@ class MealItem extends StatelessWidget {
     super.key,
     required this.meal,
     required this.onToggleFavorite,
+    required this.favoriteMeals,
   });
 
   final Meal meal;
+  final List<Meal> favoriteMeals;
   final void Function(Meal meal) onToggleFavorite;
 
   String get complexityText {
@@ -29,6 +31,7 @@ class MealItem extends StatelessWidget {
         builder: (ctx) => MealDetailsScreen(
               meal: meal,
               onToggleFavorite: onToggleFavorite,
+              favoriteMeals: favoriteMeals,
             )));
   }
 
