@@ -1,56 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meals_app/models/meal.dart';
+import 'package:meals_app/providers/favorites_provider.dart';
 
-class MealDetailsScreen extends StatefulWidget {
+class MealDetailsScreen extends ConsumerWidget {
   const MealDetailsScreen(
-      {super.key,
-      required this.meal,
-      required this.onToggleFavorite,
-      required this.favoriteMeals});
+      {super.key, required this.meal, required this.favoriteMeals});
 
   final Meal meal;
   final List<Meal> favoriteMeals;
-  final void Function(Meal meal) onToggleFavorite;
 
-  @override
-  State<MealDetailsScreen> createState() {
-    return _MealDetailsScreenState();
-  }
-}
-
-class _MealDetailsScreenState extends State<MealDetailsScreen> {
-  bool _isFavorite = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    setState(() {
-      _isFavorite = widget.favoriteMeals.contains(widget.meal);
-    });
+  void _showInfoMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    bool isFavorite = ref.watch(favoriteMealsProvider).contains(meal);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.meal.title),
+        title: Text(meal.title),
         actions: [
           IconButton(
             onPressed: () {
-              setState(() {
-                _isFavorite = !_isFavorite;
-              });
-              widget.onToggleFavorite(widget.meal);
+              final wasAdded = ref
+                  .read(favoriteMealsProvider.notifier)
+                  .toggleMealFavoriteStatus(meal);
+
+              _showInfoMessage(
+                  context,
+                  wasAdded
+                      ? 'Meal added as a favorite.'
+                      : 'Meal removed from favorites.');
             },
-            icon: Icon(_isFavorite ? Icons.star : Icons.star_outline),
+            icon: Icon(isFavorite ? Icons.star : Icons.star_outline),
           ),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Image.network(widget.meal.imageUrl),
+            Image.network(meal.imageUrl),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -66,7 +62,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                   const SizedBox(
                     height: 4,
                   ),
-                  ...widget.meal.ingredients.map(
+                  ...meal.ingredients.map(
                     (ingredient) => Text(
                       '- $ingredient',
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -87,7 +83,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen> {
                   const SizedBox(
                     height: 4,
                   ),
-                  ...widget.meal.steps.map(
+                  ...meal.steps.map(
                     (step) => Text(
                       '- $step',
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(

@@ -7,14 +7,12 @@ class CategoryGridItem extends StatelessWidget {
   const CategoryGridItem(
       {super.key,
       required this.category,
-      required this.onToggleFavorite,
       required this.availableMeals,
       required this.favoriteMeals});
 
   final Category category;
   final List<Meal> favoriteMeals;
   final List<Meal> availableMeals;
-  final void Function(Meal meal) onToggleFavorite;
 
   void _onSelectCategory(BuildContext context) {
     Navigator.of(context).push(
@@ -27,7 +25,6 @@ class CategoryGridItem extends StatelessWidget {
               )
               .toList(),
           favoriteMeals: favoriteMeals,
-          onToggleFavorite: onToggleFavorite,
         ),
       ),
     );
