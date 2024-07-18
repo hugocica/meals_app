@@ -19,7 +19,7 @@ class FiltersScreen extends ConsumerWidget {
       //     Navigator.of(context).pop();
       //
       //     if (id == 'meals') {
-      //       Navigator.of(context).pushReplacement(
+      //       Navigator.of(context).pushReplacement( // pushReplacement removes de replaces de current screen instead of pushing the screen on top, removing a possible infinite pop action (screen on top of screen on top of screen)
       //         MaterialPageRoute(
       //           builder: (ctx) => const TabsScreen(),
       //         ),
