@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meals_app/models/meal.dart';
@@ -39,14 +41,52 @@ class MealDetailsScreen extends ConsumerWidget {
                       ? 'Meal added as a favorite.'
                       : 'Meal removed from favorites.');
             },
-            icon: Icon(isFavorite ? Icons.star : Icons.star_outline),
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) {
+                final rotateAnim =
+                    Tween(begin: pi, end: 0.0).animate(animation);
+
+                return AnimatedBuilder(
+                  animation: rotateAnim,
+                  builder: (context, widget) {
+                    final isUnder = (ValueKey(isFavorite) != widget?.key);
+                    final value = isUnder
+                        ? min(rotateAnim.value, pi / 2)
+                        : rotateAnim.value;
+                    return Transform(
+                      transform: Matrix4.rotationY(value),
+                      alignment: Alignment.center,
+                      child: widget,
+                    );
+                  },
+                  child: child,
+                );
+              },
+              layoutBuilder: (widget, list) =>
+                  Stack(children: [widget!, ...list]),
+              switchInCurve: Curves.easeInBack,
+              switchOutCurve: Curves.easeOutBack,
+              child: Icon(
+                isFavorite ? Icons.star : Icons.star_outline,
+                key: ValueKey(isFavorite),
+              ),
+            ),
           ),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Image.network(meal.imageUrl),
+            Hero(
+              tag: meal.id,
+              child: Image.network(
+                meal.imageUrl,
+                height: 300,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
